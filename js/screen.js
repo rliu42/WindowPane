@@ -53,8 +53,6 @@ function updateCanvas(screen) {
     topLeftX = (x-w/2)/FRAME_WIDTH*imgW;
     topLeftY= (y+h/2)/FRAME_HEIGHT*imgH;
     context = canvas.getContext("2d");
-    context.clearRect(0,0,canvas.width,canvas.height);
+    context.clearRect(0,0,canvas.width, canvas.height);
     context.drawImage(image, topLeftX, topLeftY, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH, 0, 0, canvas.width, canvas.height);
 }
-
-state = {dims: {h: 400, w: 300}, center: {x: 900, y: 500}, rotation: -30}
