@@ -3,6 +3,7 @@
   <title>windowPane</title>
   <script src="../libraries/jquery-2.1.4.min.js"></script>
   <script src="../libraries/sketch.js"></script>
+  <script src="../libraries/lodash.js"></script>
   <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
   <script src="../js/screen.js"></script>
   <style>
@@ -16,41 +17,87 @@
 <body>
   <div id="colors_demo">
     <div class="tools">
+      <a href="#" id="clear_sketch" style="float: right; width: 100px;">Clear</a>
       <a href="#colors_sketch" data-download="png" style="float: right; width: 100px;">Download</a>
     </div>
   </div>
   <canvas id="colors_sketch" width="800" height="300"></canvas>
   <script type="text/javascript">
+    // Macros
+
     function resize_canvas() {
       $('#colors_sketch')[0].width = window.innerWidth;
       $('#colors_sketch')[0].height = window.innerHeight;
       console.log('resized');
-    }
-    $(window).resize(function() {resize_canvas();});
-
-    $(function() {
-      $.each(['#f00', '#ff0', '#0f0', '#0ff', '#00f', '#f0f', '#000', '#fff'], function() {
-        $('.tools').append("<a href='#colors_sketch' data-color='" + this + "' style='width: 10px; background: " + this + ";'></a> ");
-      });
-      $.each([3, 5, 10, 15], function() {
-        $('.tools').append("<a href='#colors_sketch' data-size='" + this + "' style='background: #ccc'>" + this + "</a> ");
-      });
-      $('#colors_sketch').sketch();
-    });
-
-    /*var fb = new Firebase("https://windowpane.firebaseio.com/");
-    function setfb() {
-      fb.set($('#colors_sketch').sketch().actions);
-    }
-    fb.on("value", function(snapshot) {
-      console.log(snapshot.val());
-      $.each(snapshot.val(), function() {
-        console.log(this);
-        $('#colors_sketch').sketch().actions.push(this);
-      });
       $('#colors_sketch').sketch().redraw();
-      // $('#colors_sketch').sketch().set();
-    });*/
+    }
+
+    function uniqueStrokes(oldArr) {
+      var newArr = _.filter(oldArr, function (element, index) {
+          for(index += 1; index < oldArr.length; index += 1) {
+              if (_.isEqual(element, oldArr[index])) {
+                  return false;
+              }
+          }
+          return true;
+      });
+      return newArr;
+    }
+
+    // Firebase
+
+    var fb = new Firebase("https://windowpane.firebaseio.com/");
+
+    function clearfb() {
+      console.log("clearing fb");
+      fb.set({});
+      $('#colors_sketch').sketch().actions = [];
+      $('#colors_sketch').sketch().redraw();
+    }
+
+    var fb = new Firebase("https://windowpane.firebaseio.com/");
+    function setfb() {
+      var actions = $('#colors_sketch').sketch().actions;
+      actions = actions.filter(function(val) { return val.color; });
+      var actionsFiltered = uniqueStrokes(actions);
+      fb.set(actionsFiltered);
+    }
+
+
+    $(document).ready(function() {
+      // Set up canvas
+
+      $(function() {
+        $.each(['#f00', '#ff0', '#0f0', '#0ff', '#00f', '#f0f', '#000', '#fff'], function() {
+          $('.tools').append("<a href='#colors_sketch' data-color='" + this + "' style='width: 10px; background: " + this + ";'></a> ");
+        });
+        $.each([3, 5, 10, 20, 50, 100], function() {
+          $('.tools').append("<a href='#colors_sketch' data-size='" + this + "' style='background: #ccc'>" + this + "</a> ");
+        });
+
+        $('#colors_sketch').sketch();
+
+      });
+
+      // Handlers
+
+      fb.on("value", function(snapshot) {
+        console.log(snapshot.val());
+        if (snapshot.val() === null) {
+          console.log('empty fb');
+          $('#colors_sketch').sketch().redraw();
+          return false;
+        }
+        $.each(snapshot.val(), function() {
+          $('#colors_sketch').sketch().actions.push(this);
+        });
+        $('#colors_sketch').sketch().redraw();
+      });
+
+      $(window).resize(function() {resize_canvas();});
+
+      $('#clear_sketch').click(function() {clearfb();});
+    });
   </script>
 
 </body>
