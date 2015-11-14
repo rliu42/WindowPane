@@ -13,7 +13,7 @@ root.once("value", function(ss) {
     alert(screens)
     var r = confirm("Join this map?");
     if (r == true) {
-        id = screens.length();
+        id = screens.length;
         alert(id)
         screens.push({
             center: {
