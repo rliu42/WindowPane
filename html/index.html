@@ -55,6 +55,7 @@
       $('#colors_sketch').sketch().redraw();
     }
 
+    var fb = new Firebase("https://windowpane.firebaseio.com/");
     function setfb() {
       var actions = $('#colors_sketch').sketch().actions;
       actions = actions.filter(function(val) { return val.color; });
@@ -78,8 +79,6 @@
 
       });
 
-
-
       // Handlers
 
       fb.on("value", function(snapshot) {
@@ -98,7 +97,6 @@
       $(window).resize(function() {resize_canvas();});
 
       $('#clear_sketch').click(function() {clearfb();});
-
     });
   </script>
 

@@ -50,6 +50,9 @@ function updateCanvas(screen) {
     topLeftX = (x-w/2)/FRAME_WIDTH*imgW;
     topLeftY= (y+h/2)/FRAME_HEIGHT*imgH;
     context = canvas.getContext("2d");
-    context.clearRect(0,0,canvas.width,canvas.height);
-    context.drawImage(image, topLeftX, topLeftY, imgW, imgH, 0, 0, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH);
+    image.onload = function(){
+        console.log("img loading");
+        context.clearRect(0,0,canvas.width,canvas.height);
+        context.drawImage(image, topLeftX, topLeftY, imgW, imgH, 0, 0, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH);
+    }
 }
