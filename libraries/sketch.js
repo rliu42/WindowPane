@@ -97,6 +97,11 @@ var __slice = Array.prototype.slice;
     };
     Sketch.prototype.onEvent = function(e) {
       if (e.originalEvent && e.originalEvent.targetTouches) {
+        if (e.originalEvent.type === 'touchend') {
+          $.sketch.tools[$(this).data('sketch').tool].onEvent.call($(this).data('sketch'),e);
+          e.preventDefault();
+          return false;
+        }
         e.pageX = e.originalEvent.targetTouches[0].pageX;
         e.pageY = e.originalEvent.targetTouches[0].pageY;
       }
