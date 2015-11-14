@@ -83,7 +83,7 @@ if __name__ == "__main__":
 		#frameDelta = absdiff(firstFrame, gray)
 		firstFrame = gray
 
-		thresh = threshold(gray, 200, 255, THRESH_BINARY)[1]
+		thresh = threshold(gray, 220, 255, THRESH_BINARY)[1]
 		edged = Canny(thresh, 1, 300)
  
 		# dilate the thresholded image to fill in holes, then find contours

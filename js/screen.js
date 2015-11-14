@@ -51,7 +51,7 @@ function updateCanvas(screen) {
     imgH = image.height;
 
     topLeftX = (x-w/2)/FRAME_WIDTH*imgW;
-    topLeftY= (y+h/2)/FRAME_HEIGHT*imgH;
+    topLeftY= (y-h/2)/FRAME_HEIGHT*imgH;
     context = canvas.getContext("2d");
     context.clearRect(0,0,canvas.width,canvas.height);
     context.drawImage(image, topLeftX, topLeftY, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH, 0, 0, canvas.width, canvas.height);
