@@ -5,16 +5,16 @@ var id = -1;
 var update = false;
 var image = new Image();
 var state;
+var r = confirm("Join this map?");
 
-root.once("value", function(ss) {
+if (r == true) {
     resize_canvas()
-    image.src = ss.val().IMAGE || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Civil_and_Naval_Ensign_of_France.svg/2000px-Civil_and_Naval_Ensign_of_France.svg.png";
-    FRAME_WIDTH = ss.val().FRAME_WIDTH
-    FRAME_HEIGHT = ss.val().FRAME_HEIGHT
-    var screens = ss.val()["screens"] || [];
-    id = screens.length;
-    var r = confirm("Join this map?");
-    if (r == true) {
+    root.once("value", function(ss) {
+        image.src = ss.val().IMAGE || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Civil_and_Naval_Ensign_of_France.svg/2000px-Civil_and_Naval_Ensign_of_France.svg.png";
+        FRAME_WIDTH = ss.val().FRAME_WIDTH
+        FRAME_HEIGHT = ss.val().FRAME_HEIGHT
+        var screens = ss.val()["screens"] || [];
+        id = screens.length;
         alert(id)
         screens.push({
             center: {
@@ -32,11 +32,12 @@ root.once("value", function(ss) {
         root.child("screens").child(id).on("value", function(ss) {
             if (update) {
                 state = ss.val();
-                updateCanvas(state)
+                updateCanvas(state);
             }
         });
-    }
-});
+
+    });
+}
 
 function updateCanvas(screen) {
     x = screen.center.x
@@ -49,9 +50,10 @@ function updateCanvas(screen) {
     imgW = image.width;
     imgH = image.height;
 
-    topLeftX = (x-w/2)/FRAME_WIDTH*imgW;
-    topLeftY= (y-h/2)/FRAME_HEIGHT*imgH;
+    topLeftX = (x - w / 2) / FRAME_WIDTH * imgW;
+    topLeftY = (y - h / 2) / FRAME_HEIGHT * imgH;
     context = canvas.getContext("2d");
-    context.clearRect(0,0,canvas.width,canvas.height);
-    context.drawImage(image, topLeftX, topLeftY, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH, 0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.rotate(r)
+    context.drawImage(image, topLeftX, topLeftY, w / FRAME_WIDTH * imgW, h / FRAME_HEIGHT * imgH, 0, 0, canvas.width, canvas.height);
 }
