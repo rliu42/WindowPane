@@ -42,7 +42,7 @@ function updateCanvas(screen) {
     w = screen.dims.w
     h = screen.dims.h
     r = screen.rotation
-    canvas = $("#colors_sketch");
+    canvas = document.getElementById("color_sketch");
     //TEMP CODE need firebase to get dimensions of full image
     imgW = image.width;
     imgH = image.height;
