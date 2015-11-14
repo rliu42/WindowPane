@@ -10,9 +10,9 @@ root.once("value", function(ss) {
     FRAME_WIDTH = ss.val().FRAME_WIDTH
     FRAME_HEIGHT = ss.val().FRAMEHEIGHT
     var screens = ss.val()["screens"] || [];
-    alert(screens)
     var r = confirm("Join this map?");
     if (r == true) {
+        console.log(screens)
         id = screens.length;
         alert(id)
         screens.push({
@@ -42,7 +42,7 @@ function updateCanvas(screen) {
     w = screen.dims.w
     h = screen.dims.h
     r = screen.rotation
-    canvas = document.getElementById("color_sketch");
+    canvas = document.getElementById("colors_sketch");
     //TEMP CODE need firebase to get dimensions of full image
     imgW = image.width;
     imgH = image.height;
