@@ -1,5 +1,46 @@
 from cv2 import *
 
+def trackFilteredObject(x, y, threshold, cameraFeed):
+	temp = Mat();
+	threshold.copyTo(temp);
+	#these two vectors needed for output of findContours
+	contours = [[]];
+	hierarchy = [];
+	#find contours of filtered image using openCV findContours function
+	findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
+	#use moments method to find our filtered object
+	refArea = 0.0;
+	objectFound = False;
+	if len(hierarchy) > 0:
+		numObjects = len(hierarchy);
+		#if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
+		if numObjects<MAX_NUM_OBJECTS:
+			index = 0;
+			while index >= 0:
+				moment = moments(cv.Mat(contours[index]));
+				area = moment.m00;
+
+				#if the area is less than 20 px by 20px then it is probably just noise
+				#if the area is the same as the 3/2 of the image size, probably just a bad filter
+				#we only want the object with the largest area so we safe a reference area each
+				#iteration and compare it to the area in the next iteration.
+				if area>MIN_OBJECT_AREA and area<MAX_OBJECT_AREA and area>refArea:
+					x = moment.m10/area;
+					y = moment.m01/area;
+					objectFound = True;
+					refArea = area;
+				else:
+					objectFound = False;
+				index = hierarchy[index][0];
+			#let user know you found an object
+			if objectFound == True:
+				putText(cameraFeed,"Tracking Object",Point(0,50),2,1,Scalar(0,255,0),2);
+				#draw object location on screen
+				drawObject(x,y,cameraFeed);
+		else:
+			putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
+
+
 if __name__ == "__main__":
 	#some boolean variables for different functionality within this
 	#program
