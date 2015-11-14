@@ -45,9 +45,11 @@ function updateCanvas(screen) {
     canvas = $("#colors_sketch");
     //TEMP CODE need firebase to get dimensions of full image
     imgW = image.width;
-    1mgH = image.height;
+    imgH = image.height;
 
     topLeftX = (x-w/2)/FRAME_WIDTH*imgW;
     topLeftY= (y+h/2)/FRAME_HEIGHT*imgH;
-    canvas.getContext("2d").drawImage(image, topLeftX, topLeftY, imgW, imgH, 0, 0, w, h);
+    context = canvas.getContext("2d");
+    context.clearRect(0,0,canvas.width,canvas.height);
+    context.drawImage(image, topLeftX, topLeftY, imgW, imgH, 0, 0, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH);
 }
