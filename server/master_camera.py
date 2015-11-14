@@ -3,16 +3,16 @@ from cv2 import *
 import numpy as np
 from matplotlib import pyplot as plt
 
-H_MIN = 0
-H_MAX = 256
-S_MIN = 0
-S_MAX = 256
-V_MIN = 0
-V_MAX = 256
+H_MIN = 91
+H_MAX = 146
+S_MIN = 147
+S_MAX = 316
+V_MIN = 52
+V_MAX = 196
 FRAME_WIDTH = 1920
 FRAME_HEIGHT = 1080
-MAX_NUM_OBJECTS = 10
-MIN_OBJECT_AREA = 20 * 20
+MAX_NUM_OBJECTS = 50
+MIN_OBJECT_AREA = 100 * 100
 MAX_OBJECT_AREA = FRAME_HEIGHT * FRAME_WIDTH / 2
 windowName = "Webcam Feed"
 windowName1 = "HSV Image"
@@ -20,18 +20,39 @@ windowName2 = "Threshold"
 windowName3 = "After Morphological Operations"
 trackbarWindowName = "Trackbars"
 
-def on_trackbar():
-	pass
+def on_trackbar_H_MIN(pos):
+	global H_MIN
+	H_MIN = pos
+
+def on_trackbar_H_MAX(pos):
+	global H_MAX
+	H_MAX = pos
+
+def on_trackbar_S_MIN(pos):
+	global S_MIN
+	S_MIN = pos
+
+def on_trackbar_S_MAX(pos):
+	global S_MAX
+	S_MAX = pos
+
+def on_trackbar_V_MIN(pos):
+	global V_MIN
+	V_MIN = pos
+
+def on_trackbar_V_MAX(pos):
+	global V_MAX
+	V_MAX = pos
 	# this function gets called 
 	# whenever a trackbar position is changed   
 def createTrackbars():
 	namedWindow(trackbarWindowName, 0)
-	createTrackbar("H_MIN", trackbarWindowName, H_MIN, H_MAX, on_trackbar)
-	createTrackbar("H_MAX", trackbarWindowName, H_MAX, H_MAX, on_trackbar)
-	createTrackbar("S_MIN", trackbarWindowName, S_MIN, S_MAX, on_trackbar)
-	createTrackbar("S_MAX", trackbarWindowName, S_MAX, S_MAX, on_trackbar)
-	createTrackbar("V_MIN", trackbarWindowName, V_MIN, V_MAX, on_trackbar)
-	createTrackbar("V_MAX", trackbarWindowName, V_MAX, V_MAX, on_trackbar)
+	createTrackbar("H_MIN", trackbarWindowName, H_MIN, H_MAX, on_trackbar_H_MIN)
+	createTrackbar("H_MAX", trackbarWindowName, H_MAX, H_MAX, on_trackbar_H_MAX)
+	createTrackbar("S_MIN", trackbarWindowName, S_MIN, S_MAX, on_trackbar_S_MIN)
+	createTrackbar("S_MAX", trackbarWindowName, S_MAX, S_MAX, on_trackbar_S_MAX)
+	createTrackbar("V_MIN", trackbarWindowName, V_MIN, V_MAX, on_trackbar_V_MIN)
+	createTrackbar("V_MAX", trackbarWindowName, V_MAX, V_MAX, on_trackbar_V_MAX)
 
 def drawObject(x, y, frame):
 	x = int(x)
@@ -69,6 +90,7 @@ def trackFilteredObject(x, y, threshold, cameraFeed):
 	#these two vectors needed for output of findContours
 	#find contours of filtered image using openCV findContours function
 	image, contours, hierarchy = findContours(temp,3,1);
+	#drawContours(cameraFeed, contours, -1, (0,255,0));
 	#use moments method to find our filtered object
 	refArea = 0.0;
 	objectFound = False;
@@ -98,8 +120,8 @@ def trackFilteredObject(x, y, threshold, cameraFeed):
 				putText(cameraFeed,"Tracking Object",(0,50),2,1,(0,255,0),2);
 					#draw object location on screen
 				drawObject(x,y,cameraFeed);
-			else:
-				putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",(0,50),1,2,(0,0,255),2);
+		else:
+			putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",(0,50),1,2,(0,0,255),2);
 
 
 if __name__ == "__main__":
