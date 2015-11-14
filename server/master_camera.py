@@ -15,7 +15,7 @@ MIN_OBJECT_AREA = 60 * 60
 MAX_OBJECT_AREA = 400 * 400
 
 colors = [(255,0,0), (0,255,0), (0,0,255), (255,255,0), (0,255,255), (255,0,255)]
-screens = []
+screens = ["none"]
 
 def syncScreens():
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
@@ -25,25 +25,28 @@ def syncScreens():
 		print "Number of connections: ", CONNECTIONS
 		print resp
 	for idx, screen in enumerate(screens):
-		s = firebase.firebaseURL(APP_NAME + "/screens/" + str(idx))
-		center, dims, rotation = screen
-		firebase.put(s, {u'center': {u'x':int(center[0]), u'y':int(center[1])}, u'dims': {u'h':int(dims[0]), u'w':int(dims[1])}, u'rotation': int(rotation)})
+		if idx > 0:
+			s = firebase.firebaseURL(APP_NAME + "/screens/" + str(idx))
+			center, dims, rotation = screen
+			firebase.put(s, {u'center': {u'x':int(center[0]), u'y':int(center[1])}, u'dims': {u'h':int(dims[0]), u'w':int(dims[1])}, u'rotation': int(rotation)})
 
 
 def interpolateScreen(rect):
 	THRESHOLD = 200
 	center, dims, rotation = rect
 	for idx, screen in enumerate(screens):
-		if  abs(screen[0][1] - center[1]) + abs(screen[0][0] - center[0]) < THRESHOLD:
-			screens[idx] = rect
-			return idx, screens[idx]
+		if idx > 0:
+			if abs(screen[0][1] - center[1]) + abs(screen[0][0] - center[0]) < THRESHOLD:
+				screens[idx] = rect
+				return idx, screens[idx]
 	return None, None
 
 
 def drawScreens(frame):
 	for idx, screen in enumerate(screens):
-		box = np.int0(boxPoints(screen))
-		fillConvexPoly(frame, box, colors[idx % len(colors)])
+		if idx > 0:
+			box = np.int0(boxPoints(screen))
+			fillConvexPoly(frame, box, colors[idx % len(colors)])
 		#for i in range(4):
 			#line(frame, (box[i][0], box[i][1]), (box[(i+1)%4][0], box[(i+1)%4][1]), (0,0,255), 2)
 
