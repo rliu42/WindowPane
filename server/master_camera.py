@@ -103,9 +103,9 @@ if __name__ == "__main__":
 				#drawContours(frame, [box], 0, (0,255,0))
 				print rect
 				idx, screen = interpolateScreen(rect)
-				if idx is None and len(screens) < CONNECTIONS:
+				if idx is None and len(screens)-1 < CONNECTIONS:
 					screens.append(rect)
-				if len(screens) == CONNECTIONS:
+				if len(screens)-1 == CONNECTIONS:
 					break
 
 		drawScreens(frame)
