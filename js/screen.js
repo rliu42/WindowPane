@@ -4,11 +4,13 @@ var FRAME_HEIGHT;
 var id = -1;
 var update = false;
 var image = new Image();
+var state;
 image.src = "http://wallpapercave.com/wp/4JKHi7a.jpg";
 
 root.once("value", function(ss) {
+    resize_canvas()
     FRAME_WIDTH = ss.val().FRAME_WIDTH
-    FRAME_HEIGHT = ss.val().FRAMEHEIGHT
+    FRAME_HEIGHT = ss.val().FRAME_HEIGHT
     var screens = ss.val()["screens"] || [];
     var r = confirm("Join this map?");
     if (r == true) {
@@ -30,7 +32,8 @@ root.once("value", function(ss) {
         update = true
         root.child("screens").child(id).on("value", function(ss) {
             if (update) {
-                updateCanvas(ss.val())
+                state = ss.val();
+                updateCanvas(state)
             }
         });
     }
@@ -51,5 +54,7 @@ function updateCanvas(screen) {
     topLeftY= (y+h/2)/FRAME_HEIGHT*imgH;
     context = canvas.getContext("2d");
     context.clearRect(0,0,canvas.width,canvas.height);
-    context.drawImage(image, topLeftX, topLeftY, imgW, imgH, 0, 0, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH);
+    context.drawImage(image, topLeftX, topLeftY, w/FRAME_WIDTH*imgW, h/FRAME_HEIGHT*imgH, 0, 0, canvas.width, canvas.height);
 }
+
+state = {dims: {h: 400, w: 300}, center: {x: 900, y: 500}, rotation: -30}
