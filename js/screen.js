@@ -12,10 +12,9 @@ root.once("value", function(ss) {
     FRAME_WIDTH = ss.val().FRAME_WIDTH
     FRAME_HEIGHT = ss.val().FRAME_HEIGHT
     var screens = ss.val()["screens"] || [];
+    id = screens.length;
     var r = confirm("Join this map?");
     if (r == true) {
-        console.log(screens)
-        id = screens.length;
         alert(id)
         screens.push({
             center: {
