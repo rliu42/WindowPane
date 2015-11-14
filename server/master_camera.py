@@ -67,7 +67,6 @@ if __name__ == "__main__":
 	firstFrame = None
 	while True:
 		if COUNTER == 0:
-			screens_copy = screens[::]
 			thread.start_new_thread(syncScreens, ())	
 		#store image to matrix
 		rval, frame = capture.read()
@@ -106,8 +105,9 @@ if __name__ == "__main__":
 				#drawContours(frame, [box], 0, (0,255,0))
 				print rect
 				idx, screen = interpolateScreen(rect)
-				if idx is None and len(screens)-1 < CONNECTIONS:
+				if idx is None and len(screens)-1 <= CONNECTIONS:
 					screens.append(rect)
+				print screens
 				if len(screens)-1 == CONNECTIONS:
 					break
 
