@@ -5,10 +5,10 @@ var id = -1;
 var update = false;
 var image = new Image();
 var state;
-image.src = "http://wallpapercave.com/wp/4JKHi7a.jpg";
 
 root.once("value", function(ss) {
     resize_canvas()
+    image.src = ss.val().IMAGE || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Civil_and_Naval_Ensign_of_France.svg/2000px-Civil_and_Naval_Ensign_of_France.svg.png";
     FRAME_WIDTH = ss.val().FRAME_WIDTH
     FRAME_HEIGHT = ss.val().FRAME_HEIGHT
     var screens = ss.val()["screens"] || [];
