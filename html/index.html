@@ -3,6 +3,7 @@
   <title>windowPane</title>
   <script src="../libraries/jquery-2.1.4.min.js"></script>
   <script src="../libraries/sketch.js"></script>
+  <script src="../libraries/lodash.js"></script>
   <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
   <style>
     .tools { margin-bottom: 10px; }
@@ -37,14 +38,31 @@
       $('#colors_sketch').sketch();
     });
 
-    var fb = new Firebase("https://windowpane.firebaseio.com/");
-    function setfb() {
-      fb.set($('#colors_sketch').sketch().actions);
+    function uniqueStrokes(oldArr) {
+      var newArr = _.filter(oldArr, function (element, index) {
+          for(index += 1; index < oldArr.length; index += 1) {
+              if (_.isEqual(element, oldArr[index])) {
+                  return false;
+              }
+          }
+          return true;
+      });
+      return newArr;
     }
+
+    var fb = new Firebase("https://windowpane.firebaseio.com/");
+
+    function setfb() {
+      var actions =$('#colors_sketch').sketch().actions;
+      actions = actions.filter(function(val) { return val.color; });
+      var actionsFiltered = uniqueStrokes(actions);
+      fb.set(actionsFiltered);
+    }
+
     fb.on("value", function(snapshot) {
       console.log(snapshot.val());
       $.each(snapshot.val(), function() {
-        console.log(this);
+        // console.log(this);
         $('#colors_sketch').sketch().actions.push(this);
       });
       $('#colors_sketch').sketch().redraw();
