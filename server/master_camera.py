@@ -1,178 +1,106 @@
-import cv2
 from cv2 import *
 import numpy as np
 from matplotlib import pyplot as plt
+import requests, json, firebase
 
-H_MIN = 91
-H_MAX = 146
-S_MIN = 147
-S_MAX = 316
-V_MIN = 52
-V_MAX = 196
+APP_NAME = 'window-pane'
+
+CONNECTIONS = 1
+FRAME_RATE = 30 # frame update rate in ms
+SYNC_SCREEN_RATE = 1000 # check for new screens every X ms
+COUNTER = 0
+
 FRAME_WIDTH = 1920
 FRAME_HEIGHT = 1080
-MAX_NUM_OBJECTS = 50
 MIN_OBJECT_AREA = 100 * 100
-MAX_OBJECT_AREA = FRAME_HEIGHT * FRAME_WIDTH / 2
-windowName = "Webcam Feed"
-windowName1 = "HSV Image"
-windowName2 = "Threshold"
-windowName3 = "After Morphological Operations"
-trackbarWindowName = "Trackbars"
+MAX_OBJECT_AREA = 400 * 400
 
-def on_trackbar_H_MIN(pos):
-	global H_MIN
-	H_MIN = pos
+screens = []
 
-def on_trackbar_H_MAX(pos):
-	global H_MAX
-	H_MAX = pos
+def syncScreens():
+	root = firebase.firebaseURL(APP_NAME)
+	firebase.patch(root, {u'FRAME_WIDTH': FRAME_WIDTH , u'FRAME_HEIGHT': FRAME_HEIGHT})
+	_screens = firebase.firebaseURL(APP_NAME + "/screens")
+	resp = firebase.get(_screens)
+	if resp is not None:
+		CONNECTIONS = len(resp)
+		print "Number of connections: ", CONNECTIONS
+		print resp
+	for idx, screen in enumerate(screens):
+		s = firebase.firebaseURL(APP_NAME + "/screens/" + str(idx))
+		firebase.put(s, {u'x': screen[0], u'y': screen[1], u'w': screen[2], u'h': screen[3]})
 
-def on_trackbar_S_MIN(pos):
-	global S_MIN
-	S_MIN = pos
 
-def on_trackbar_S_MAX(pos):
-	global S_MAX
-	S_MAX = pos
+def interpolateScreen(rect):
+	THRESHOLD = 400
+	for idx, screen in enumerate(screens):
+		if sum([abs(rect[i] - screen[i]) for i in range(4)]) < THRESHOLD:
+			screens[idx] = rect
+			return idx, screens[idx]
+	return None, None
 
-def on_trackbar_V_MIN(pos):
-	global V_MIN
-	V_MIN = pos
 
-def on_trackbar_V_MAX(pos):
-	global V_MAX
-	V_MAX = pos
-	# this function gets called 
-	# whenever a trackbar position is changed   
-def createTrackbars():
-	namedWindow(trackbarWindowName, 0)
-	createTrackbar("H_MIN", trackbarWindowName, H_MIN, H_MAX, on_trackbar_H_MIN)
-	createTrackbar("H_MAX", trackbarWindowName, H_MAX, H_MAX, on_trackbar_H_MAX)
-	createTrackbar("S_MIN", trackbarWindowName, S_MIN, S_MAX, on_trackbar_S_MIN)
-	createTrackbar("S_MAX", trackbarWindowName, S_MAX, S_MAX, on_trackbar_S_MAX)
-	createTrackbar("V_MIN", trackbarWindowName, V_MIN, V_MAX, on_trackbar_V_MIN)
-	createTrackbar("V_MAX", trackbarWindowName, V_MAX, V_MAX, on_trackbar_V_MAX)
-
-def drawObject(x, y, frame):
-	x = int(x)
-	y = int(y)
-	circle(frame, (x, y), 20, (0, 255, 0), 2)
-	if y-25>0:
-		line(frame, (x, y), (x, y-25), (0, 255, 0), 2)
-	else:
-		line(frame,(x,y),(x,0),(0,255,0),2)
-	if y+25<FRAME_HEIGHT:
-		line(frame,(x,y),(x,y+25),(0,255,0),2)
-	else:
-		line(frame,(x,y),(x,FRAME_HEIGHT),(0,255,0),2)
-	if x-25>0:
-		line(frame,(x,y),(x-25,y),(0,255,0),2)
-	else:
-		line(frame,(x,y),(0,y),(0,255,0),2)
-	if x+25<FRAME_WIDTH:
-		line(frame,(x,y),(x+25,y),(0,255,0),2)
-	else:
-		line(frame,(x,y),(FRAME_WIDTH,y),(0,255,0),2)
-	putText(frame, str(x) + "," + str(y), (x, y+30), 1,1,(0,255,0),2)
-
-def morphOps(thresh):
-	erodeElement = getStructuringElement(MORPH_RECT, (3,3))
-	dilateElement = getStructuringElement(MORPH_RECT, (8,8))
-	erode(thresh,thresh,erodeElement)
-	erode(thresh,thresh,erodeElement)
-
-	dilate(thresh,thresh,dilateElement)
-	dilate(thresh,thresh,dilateElement)
-
-def trackFilteredObject(x, y, threshold, cameraFeed):
-	temp = threshold
-	#these two vectors needed for output of findContours
-	#find contours of filtered image using openCV findContours function
-	image, contours, hierarchy = findContours(temp,3,1);
-	#drawContours(cameraFeed, contours, -1, (0,255,0));
-	#use moments method to find our filtered object
-	refArea = 0.0;
-	objectFound = False;
-	if len(hierarchy) > 0:
-		numObjects = len(hierarchy);
-		#if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
-		if numObjects<MAX_NUM_OBJECTS:
-			index = 0;
-			while index >= 0:
-				moment = moments(contours[index]);
-				area = moment["m00"];
-
-				#if the area is less than 20 px by 20px then it is probably just noise
-				#if the area is the same as the 3/2 of the image size, probably just a bad filter
-				#we only want the object with the largest area so we safe a reference area each
-				#iteration and compare it to the area in the next iteration.
-				if area>MIN_OBJECT_AREA and area<MAX_OBJECT_AREA and area>refArea:
-					x = moment["m10"]/area;
-					y = moment["m01"]/area;
-					objectFound = True;
-					refArea = area;
-				else:
-					objectFound = False;
-				index = hierarchy[index][0][0];
-			#let user know you found an object
-			if objectFound == True:
-				putText(cameraFeed,"Tracking Object",(0,50),2,1,(0,255,0),2);
-					#draw object location on screen
-				drawObject(x,y,cameraFeed);
-		else:
-			putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",(0,50),1,2,(0,0,255),2);
+def drawScreens():
+	for screen in screens:
+		(x, y, w, h) = screen
+		rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 
 if __name__ == "__main__":
-	#some boolean variables for different functionality within this
-	#program
-	trackObjects = True;
-	useMorphOps = True;
-	#Matrix to store aech frame of the webcam feed
-	#cameraFeed = np.ndarray((1,1), dtype=np.float32)
-	#matrix storage for HSV image
-	#HSV = np.ndarray((1,1), dtype=np.float32)
-	#matrix storage for binary threshold image
-	#threshold = np.ndarray((1,1), dtype=np.float32)
-	#x and y values for the location of the object
-	x=0;
-	y=0;
-	#create slider bars for HSV filtering
-	createTrackbars();
-	#video capture object to acquire webcam feed
 	capture = VideoCapture();
-	#open capture object at location zero (default location for webcam)
 	capture.open(0);
 	#set height and width of capture frame
 	capture.set(4,FRAME_WIDTH);
 	capture.set(5,FRAME_HEIGHT);
 	#start an infinite loop where webcam feed is copied to cameraFeed matrix
 	#all of our operations will be performed within this loop
+	firstFrame = None
 	while True:
+		if COUNTER == 0:
+			syncScreens()
 		#store image to matrix
-		rval, cameraFeed = capture.read()
+		rval, frame = capture.read()
+		if not rval:
+			break
 		#convert frame from BGR to HSV colorspace
-		HSV = cvtColor(cameraFeed,COLOR_BGR2HSV);
-		#filter HSV image between values and store filtered image to
-		#threshold matrix
-		threshold = inRange(HSV,(H_MIN,S_MIN,V_MIN),(H_MAX,S_MAX,V_MAX));
-		#perform morphological operations on thresholded image to eliminate noise
-		#and emphasize the filtered object(s)
-		if useMorphOps:
-			morphOps(threshold);
-		#pass in thresholded frame to our object tracking function
-		#this function will return the x and y coordinates of the
-		#filtered object
-		if trackObjects:
-			trackFilteredObject(x,y,threshold,cameraFeed);
+		gray = cvtColor(frame, COLOR_BGR2GRAY)
+		if firstFrame is None:
+			firstFrame = gray
+			continue
 
-		#show frames 
-		imshow(windowName2,threshold);
-		imshow(windowName,cameraFeed);
-		imshow(windowName1,HSV);
+		# compute the absolute difference between the current frame and
+		# first frame
+		gray = bilateralFilter(gray, 11, 17, 17)
+		#frameDelta = absdiff(firstFrame, gray)
+		firstFrame = gray
+
+		thresh = threshold(gray, 50, 255, THRESH_BINARY)[1]
+		edged = Canny(thresh, 10, 300)
+ 
+		# dilate the thresholded image to fill in holes, then find contours
+		# on thresholded image
+		edged = dilate(edged, None, iterations=3)
+		(_, cnts, _) = findContours(edged.copy(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE)
+ 
+		for c in cnts:
+			peri = arcLength(c, True)
+			approx = approxPolyDP(c, 0.02 * peri, True)
+			# if the contour is too small, ignore it
+			if contourArea(c) > MIN_OBJECT_AREA and contourArea(c) < MAX_OBJECT_AREA and len(approx) == 4:
+				(x, y, w, h) = boundingRect(c)
+				idx, screen = interpolateScreen((x, y, w, h))
+				if idx is None and len(screens) < CONNECTIONS:
+					screens.append((x, y, w, h))
+
+		drawScreens()
+
+		#imshow("Delta",frameDelta);
+		imshow("Edges", edged);
+		imshow("Thresh", thresh)
+		imshow("Webcam", frame);
 		
 
 		#delay 30ms so that screen can refresh.
 		#image will not appear without this waitKey() command
-		waitKey(30);
+		COUNTER = (COUNTER + 1) % int(SYNC_SCREEN_RATE / FRAME_RATE)
+		waitKey(FRAME_RATE);
