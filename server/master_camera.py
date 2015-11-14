@@ -6,11 +6,11 @@ APP_NAME = 'window-pane'
 
 CONNECTIONS = 0
 FRAME_RATE = 15 # frame update rate in ms
-SYNC_SCREEN_RATE = 500 # check for new screens every X ms
+SYNC_SCREEN_RATE = 100 # check for new screens every X ms
 COUNTER = 0
 
-FRAME_WIDTH = 1920
-FRAME_HEIGHT = 1080
+FRAME_WIDTH = 640
+FRAME_HEIGHT = 480
 MIN_OBJECT_AREA = 60 * 60
 MAX_OBJECT_AREA = 400 * 400
 
@@ -81,10 +81,10 @@ if __name__ == "__main__":
 
 		# compute the absolute difference between the current frame and
 		# first frame
-		frameDelta = absdiff(firstFrame, gray)
+		#frameDelta = absdiff(firstFrame, gray)
 		firstFrame = gray
 
-		thresh = threshold(frameDelta, 100, 255, THRESH_BINARY)[1]
+		thresh = threshold(gray, 200, 255, THRESH_BINARY)[1]
 		edged = Canny(thresh, 1, 300)
  
 		# dilate the thresholded image to fill in holes, then find contours
@@ -97,25 +97,27 @@ if __name__ == "__main__":
 			approx = approxPolyDP(c, 0.02 * peri, True)
 			# if the contour is too small, ignore it
 			# drawContours(frame, [c], 0, (0,0, 255), 2)
-			if contourArea(c) > MIN_OBJECT_AREA and contourArea(c) < MAX_OBJECT_AREA and len(approx) <= 6:
-				rect = minAreaRect(c)
+			rect = minAreaRect(c)
+			area = rect[1][0] * rect[1][1]
+			if area > MIN_OBJECT_AREA and area < MAX_OBJECT_AREA and len(approx) <= 6:
+				#rect = minAreaRect(c)
 				#box = boxPoints(rect)
 				#box = np.int0(box)
 				#for i in range(4):
 					#line(frame, (box[i][0], box[i][1]), (box[(i+1)%4][0], box[(i+1)%4][1]), (0,255,0), 2)
 				#drawContours(frame, [box], 0, (0,255,0))
-				print rect
+				#print rect
 				idx, screen = interpolateScreen(rect)
 				if idx is None and len(screens)-1 <= CONNECTIONS:
 					screens.append(rect)
-				print screens
+				#print screens
 				if len(screens)-1 == CONNECTIONS:
 					break
 
 		drawScreens(frame)
 
-		imshow("Delta",frameDelta);
-		#imshow("Edges", edged);
+		#imshow("Delta",frameDelta);
+		imshow("Edges", edged);
 		#imshow("Thresh", thresh)
 		imshow("Webcam", frame);
 		
