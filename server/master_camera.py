@@ -19,10 +19,9 @@ windowName2 = "Threshold"
 windowName3 = "After Morphological Operations"
 trackbarWindowName = "Trackbars"
 
-
 def on_trackbar():
 	# this function gets called 
-	# whenever a trackbar position is changed	
+	# whenever a trackbar position is changed   
 
 def createTrackbars():
 	namedWindow(trackbarWindowName, 0)
@@ -59,7 +58,7 @@ def morphOps(thresh):
 	erode(thresh,thresh,erodeElement)
 	erode(thresh,thresh,erodeElement)
 
-	dilate(thresh,thresh,dilatElement)
+	dilate(thresh,thresh,dilateElement)
 	dilate(thresh,thresh,dilateElement)
 
 if __name__ == "__main__":
