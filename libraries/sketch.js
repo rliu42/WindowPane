@@ -93,6 +93,7 @@ var __slice = Array.prototype.slice;
       }
       this.painting = false;
       this.action = null;
+      setfb();
       return this.redraw();
     };
     Sketch.prototype.onEvent = function(e) {

@@ -37,13 +37,18 @@
       $('#colors_sketch').sketch();
     });
 
-    $(window).on("touchstart", function(ev) {
-      var e = ev.originalEvent;
-      console.log(e.touches);
-    });
-    $(window).on("touchend", function(ev) {
-      var e = ev.originalEvent;
-      console.log(e.touches);
+    var fb = new Firebase("https://windowpane.firebaseio.com/");
+    function setfb() {
+      console.log($('#colors_sketch').sketch().actions);
+      fb.set($('#colors_sketch').sketch().actions);
+    }
+    fb.on("value", function(snapshot) {
+      console.log(snapshot.val());
+      $.each(snapshot.val(), function() {
+        console.log(this);
+        $('#colors_sketch').sketch().set(this);
+      });
+      // $('#colors_sketch').sketch().set();
     });
   </script>
 
