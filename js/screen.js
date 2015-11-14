@@ -8,7 +8,7 @@ image.src = "http://wallpapercave.com/wp/4JKHi7a.jpg";
 
 root.once("value", function(ss) {
     FRAME_WIDTH = ss.val().FRAME_WIDTH
-    FRAME_HEIGHT = ss.val().FRAMEHEIGHT
+    FRAME_HEIGHT = ss.val().FRAME_HEIGHT
     var screens = ss.val()["screens"] || [];
     var r = confirm("Join this map?");
     if (r == true) {
