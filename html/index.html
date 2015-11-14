@@ -36,6 +36,15 @@
       });
       $('#colors_sketch').sketch();
     });
+
+    $(window).on("touchstart", function(ev) {
+      var e = ev.originalEvent;
+      console.log(e.touches);
+    });
+    $(window).on("touchend", function(ev) {
+      var e = ev.originalEvent;
+      console.log(e.touches);
+    });
   </script>
 
 </body>
