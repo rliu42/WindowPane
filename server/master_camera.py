@@ -67,7 +67,6 @@ if __name__ == "__main__":
 	firstFrame = None
 	while True:
 		if COUNTER == 0:
-			screens_copy = screens[::]
 			thread.start_new_thread(syncScreens, ())	
 		#store image to matrix
 		rval, frame = capture.read()

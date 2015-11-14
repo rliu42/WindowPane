@@ -4,9 +4,11 @@ var FRAME_HEIGHT;
 var id = -1;
 var update = false;
 var image = new Image();
-image.src = "http://wallpapercave.com/wp/4JKHi7a.jpg";
+var state;
 
 root.once("value", function(ss) {
+    resize_canvas()
+    image.src = ss.val().IMAGE || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Civil_and_Naval_Ensign_of_France.svg/2000px-Civil_and_Naval_Ensign_of_France.svg.png";
     FRAME_WIDTH = ss.val().FRAME_WIDTH
     FRAME_HEIGHT = ss.val().FRAME_HEIGHT
     var screens = ss.val()["screens"] || [];
@@ -30,7 +32,8 @@ root.once("value", function(ss) {
         update = true
         root.child("screens").child(id).on("value", function(ss) {
             if (update) {
-                updateCanvas(ss.val())
+                state = ss.val();
+                updateCanvas(state)
             }
         });
     }
