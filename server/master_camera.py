@@ -15,6 +15,7 @@ FRAME_RATIO = 2.25
 MIN_OBJECT_AREA = 30 * 40
 MAX_OBJECT_AREA = 400 * 400
 prevResp = []
+portrait = True
 
 colors = [(255,0,0), (0,255,0), (0,0,255), (255,255,0), (0,255,255), (255,0,255)]
 screens = ["none"]
@@ -28,6 +29,9 @@ def syncScreens():
 		if len(resp) != len(prevResp):
 			print "Number of connections: ", CONNECTIONS
 			print resp
+			if CONNECTIONS >= 1:
+				if "innerWidth" in resp[-1].keys():
+					portrait = resp[-1]["innerWidth"] > resp[-1]["innerHeight"]
 			prevResp = resp
 	for idx, screen in enumerate(screens):
 		if idx > 0:
@@ -113,7 +117,11 @@ if __name__ == "__main__":
 				if idx == None and len(screens)-1 < CONNECTIONS:
 					print "Detected new screen"
 					center, dims, rotation = rect
-					screens.append([list(center), list(dims), 0])
+					if portrait:
+						dims = [max(dims), min(dims)]
+					else:
+						dims = [min(dims), max(dims)]
+					screens.append([list(center), dims, 0])
 				if len(screens)-1 == CONNECTIONS:
 					break
 

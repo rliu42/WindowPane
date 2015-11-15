@@ -26,6 +26,8 @@ $(document).ready(function() {
             } else {
                 id = screens.length
                 screens.push({
+                    innerWidth: window.innerWidth,
+                    innerHeight: window.innerHeight,
                     center: {
                         x: -1,
                         y: -1
