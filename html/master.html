@@ -56,24 +56,10 @@
     }
 
     function setfb() {
-      // return true;
       var actions = $('#colors_sketch').sketch().actions;
-      console.log('before filtering ', actions.length);
       actions = actions.filter(function(val) { return val.color; });
-      console.log('after color filtering ', actions.length);
-      actions = actions.filter(function(val) {
-        if (val.isOld) { return false; }
-        return true;
-      })
-      console.log('after old filtering ', actions.length);
       var actionsFiltered = uniqueStrokes(actions);
-      console.log('after strokes filtering ', actionsFiltered.length);
-      actionsFinal = []
-      $.each(actions, function (i,action) {
-        actionsFinal.push(localToGlobal(action))
-      });
-      console.log('after localtoglobalswap ', actionsFinal.length);
-      fb.set(actionsFinal);
+      fb.set(actionsFiltered);
     }
 
 
@@ -102,7 +88,7 @@
           return false;
         }
         $.each(snapshot.val(), function() {
-          $('#colors_sketch').sketch().actions.push(globalToLocal(this));
+          $('#colors_sketch').sketch().actions.push(this);
         });
         $('#colors_sketch').sketch().redraw();
       });
@@ -112,6 +98,6 @@
       $('#clear_sketch').click(function() {clearfb();});
     });
   </script>
-  <script src="../js/screen.js"></script>
+  <!-- <script src="../js/screen.js"></script> -->
 
 </body>
