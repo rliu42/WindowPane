@@ -11,8 +11,8 @@ COUNTER = 0
 
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
-FRAME_RATIO = 2
-MIN_OBJECT_AREA = 30 * 50
+FRAME_RATIO = 2.25
+MIN_OBJECT_AREA = 30 * 40
 MAX_OBJECT_AREA = 400 * 400
 
 colors = [(255,0,0), (0,255,0), (0,0,255), (255,255,0), (0,255,255), (255,0,255)]
@@ -34,20 +34,24 @@ def syncScreens():
 
 
 def interpolateScreen(rect):
-	THRESHOLD = 100
+	THRESHOLD = 75
 	center, dims, rotation = rect
 	for idx, screen in enumerate(screens):
 		if idx > 0:
-			if abs(screen[0][1] - center[1]) + abs(screen[0][0] - center[0]) < THRESHOLD:
-				screens[idx] = rect
+			diff = abs(screen[0][1] - center[1]) + abs(screen[0][0] - center[0]) 
+			if (diff > 5 and diff < THRESHOLD):
+				screens[idx][0] = list(center)
+				screens[idx][2] = rotation
 				return idx, screens[idx]
+			elif diff <= 5:
+				return -1, -1
 	return None, None
 
 
 def drawScreens(frame):
 	for idx, screen in enumerate(screens):
 		if idx > 0:
-			box = np.int0(boxPoints(screen))
+			box = np.int0(boxPoints((tuple(screen[0]), tuple(screen[1]), screen[2])))
 			fillConvexPoly(frame, box, colors[idx % len(colors)])
 		#for i in range(4):
 			#line(frame, (box[i][0], box[i][1]), (box[(i+1)%4][0], box[(i+1)%4][1]), (0,0,255), 2)
@@ -90,7 +94,7 @@ if __name__ == "__main__":
  
 		# dilate the thresholded image to fill in holes, then find contours
 		# on thresholded image
-		edged = dilate(edged, None, iterations=3)
+		edged = dilate(edged, None, iterations=2)
 		(_, cnts, _) = findContours(edged.copy(), RETR_TREE, CHAIN_APPROX_SIMPLE)
  
 		for c in cnts:
@@ -113,7 +117,8 @@ if __name__ == "__main__":
 				#print idx, len(screens), CONNECTIONS
 				if idx == None and len(screens)-1 < CONNECTIONS:
 					print "Detected new screen"
-					screens.append(rect)
+					center, dims, rotation = rect
+					screens.append([list(center), list(dims), rotation])
 				#print screens
 				if len(screens)-1 == CONNECTIONS:
 					break
@@ -121,7 +126,7 @@ if __name__ == "__main__":
 		drawScreens(frame)
 
 		#imshow("Delta",frameDelta);
-		#imshow("Edges", edged);
+		imshow("Edges", edged);
 		#imshow("Thresh", thresh)
 		imshow("Webcam", frame);
 		
