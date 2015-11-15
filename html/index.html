@@ -46,7 +46,7 @@
 
     // Firebase
 
-    var fb = new Firebase("https://lcarter.firebaseio.com/");
+    var fb = new Firebase("https://windowpane.firebaseio.com/");
 
     function clearfb() {
       console.log("clearing fb");
@@ -70,10 +70,10 @@
       console.log('after strokes filtering ', actionsFiltered.length);
       actionsFinal = []
       $.each(actions, function (i,action) {
-        actionsFinal.push(localToGlobal(action))
+        fb.push(localToGlobal(action))
       });
-      console.log('after localtoglobalswap ', actionsFinal.length);
-      fb.set(actionsFinal);
+      // console.log('after localtoglobalswap ', actionsFinal.length);
+      // fb.update(actionsFinal);
     }
 
 
@@ -98,12 +98,15 @@
         console.log(snapshot.val());
         if (snapshot.val() === null) {
           console.log('empty fb');
+          $('#colors_sketch').sketch().actions = [];
           $('#colors_sketch').sketch().redraw();
           return false;
         }
+        var actionsToBe = [];
         $.each(snapshot.val(), function() {
-          $('#colors_sketch').sketch().actions.push(globalToLocal(this));
+          actionsToBe.push(globalToLocal(this));
         });
+        $('#colors_sketch').sketch().actions = actionsToBe;
         $('#colors_sketch').sketch().redraw();
       });
 

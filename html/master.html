@@ -46,7 +46,7 @@
 
     // Firebase
 
-    var fb = new Firebase("https://lcarter.firebaseio.com/");
+    var fb = new Firebase("https://windowpane.firebaseio.com/");
 
     function clearfb() {
       console.log("clearing fb");
@@ -84,6 +84,8 @@
         console.log(snapshot.val());
         if (snapshot.val() === null) {
           console.log('empty fb');
+          $('#colors_sketch').sketch().actions = [];
+
           $('#colors_sketch').sketch().redraw();
           return false;
         }
