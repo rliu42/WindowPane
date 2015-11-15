@@ -14,18 +14,21 @@ FRAME_HEIGHT = 480
 FRAME_RATIO = 2.25
 MIN_OBJECT_AREA = 30 * 40
 MAX_OBJECT_AREA = 400 * 400
+prevResp = []
 
 colors = [(255,0,0), (0,255,0), (0,0,255), (255,255,0), (0,255,255), (255,0,255)]
 screens = ["none"]
 
 def syncScreens():
-	global CONNECTIONS
+	global CONNECTIONS, prevResp
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
 	resp = firebase.get(_screens)
 	if resp is not None:
 		CONNECTIONS = len(resp) - 1
-		print "Number of connections: ", CONNECTIONS
-		print resp
+		if len(resp) != len(prevResp):
+			print "Number of connections: ", CONNECTIONS
+			print resp
+			prevResp = resp
 	for idx, screen in enumerate(screens):
 		if idx > 0:
 			s = firebase.firebaseURL(APP_NAME + "/screens/" + str(idx))
@@ -36,7 +39,6 @@ def syncScreens():
 def interpolateScreen(rect):
 	THRESHOLD = 75
 	center, dims, rotation = rect
-	rotation = min(rotation, rotation + 90)
 	for idx, screen in enumerate(screens):
 		if idx > 0:
 			diff = abs(screen[0][1] - center[1]) + abs(screen[0][0] - center[0]) 
@@ -50,12 +52,12 @@ def interpolateScreen(rect):
 
 
 def drawScreens(frame):
+	#print screens
 	for idx, screen in enumerate(screens):
 		if idx > 0:
-			box = np.int0(boxPoints((tuple(screen[0]), tuple(screen[1]), screen[2])))
+			rect = (tuple(screen[0]), tuple(screen[1]), screen[2])
+			box = np.int0(boxPoints(rect))
 			fillConvexPoly(frame, box, colors[idx % len(colors)])
-		#for i in range(4):
-			#line(frame, (box[i][0], box[i][1]), (box[(i+1)%4][0], box[(i+1)%4][1]), (0,0,255), 2)
 
 
 if __name__ == "__main__":
@@ -119,6 +121,8 @@ if __name__ == "__main__":
 				if idx == None and len(screens)-1 < CONNECTIONS:
 					print "Detected new screen"
 					center, dims, rotation = rect
+					if type(rotation) != type(0.0):
+						rotation = rotation[0][0]
 					screens.append([list(center), list(dims), rotation])
 				#print screens
 				if len(screens)-1 == CONNECTIONS:
