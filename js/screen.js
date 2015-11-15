@@ -18,27 +18,36 @@ $(document).ready(function() {
             FRAME_WIDTH = ss.val().FRAME_WIDTH
             FRAME_HEIGHT = ss.val().FRAME_HEIGHT
             var screens = ss.val()["screens"] || [];
-            id = ss.val().RELOAD;
-            if (id < 0) {
-                screens.length;
+            if (ss.val().valid == "yes" && ss.val().RELOAD > 0) {
+                id = ss.val().RELOAD;
+                root.update({
+                    valid: "no"
+                })
+            } else {
+                id = screens.length
+                screens.push({
+                    center: {
+                        x: -1,
+                        y: -1
+                    },
+                    dims: {
+                        h: -1,
+                        w: -1
+                    },
+                    rotation: 0
+                });
             }
-            screens.push({
-                center: {
-                    x: -1,
-                    y: -1
-                },
-                dims: {
-                    h: -1,
-                    w: -1
-                },
-                rotation: 0
-            });
             root.child("screens").update(screens);
+            $("#id").html(id)
             update = true
             root.child("screens").child(id).on("value", function(ss) {
                 if (update) {
                     state = ss.val();
-                    updateCanvas(state);
+                    if (state) {
+                        updateCanvas(state);
+                    } else {
+                        id = -1
+                    }
                 }
             });
 
@@ -48,7 +57,10 @@ $(document).ready(function() {
 
 function reload() {
     if (id > 0) {
-        root.update({RELOAD: id})
+        root.update({
+            RELOAD: id,
+            valid: "yes"
+        })
     }
     location.reload(true)
 }

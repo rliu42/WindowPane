@@ -62,7 +62,7 @@ def drawScreens(frame):
 
 if __name__ == "__main__":
 	root = firebase.firebaseURL(APP_NAME)
-	firebase.patch(root, {u'FRAME_WIDTH': FRAME_WIDTH , u'FRAME_HEIGHT': FRAME_HEIGHT, u'RELOAD': -1})
+	firebase.patch(root, {u'FRAME_WIDTH': FRAME_WIDTH , u'FRAME_HEIGHT': FRAME_HEIGHT, u'RELOAD': -1, u'valid': "no"})
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
 	firebase.put(_screens, {u'0': 'none'})
 
