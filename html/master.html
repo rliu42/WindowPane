@@ -21,7 +21,7 @@
       <a href="#colors_sketch" data-download="png" style="float: right; width: 100px;">Download</a>
     </div>
   </div>
-  <canvas id="colors_sketch" width="800" height="300"></canvas>
+  <canvas id="colors_sketch" width="2880" height="1519"></canvas>
   <script type="text/javascript">
     // Macros
 
@@ -29,6 +29,8 @@
       $('#colors_sketch')[0].width = window.innerWidth;
       $('#colors_sketch')[0].height = window.innerHeight;
       console.log('resized');
+      console.log(window.innerWidth);
+      console.log(window.innerHeight);
       $('#colors_sketch').sketch().redraw();
     }
 

@@ -1,6 +1,8 @@
 var root = new Firebase("https://window-pane.firebaseio.com");
 var FRAME_WIDTH;
 var FRAME_HEIGHT;
+var masterCanvasWidth = 2880;
+var masterCanvasHeight = 1519;
 var id = -1;
 var update = false;
 var image = new Image();
@@ -89,6 +91,11 @@ function updateCanvas(screen) {
 }
 
 function globalToLocal(action) {
+    x = state.center.x
+    y = state.center.y
+    w = state.dims.w
+    h = state.dims.h
+    r = state.rotation
     //set masterCanvasWidth and masterCanvasHeight
     canvasWidth = $('#colors_sketch')[0].width;
     canvasHeight = $('#colors_sketch')[0].height;
@@ -106,6 +113,12 @@ function globalToLocal(action) {
 }
 
 function localToGlobal(action) {
+
+    x = state.center.x
+    y = state.center.y
+    w = state.dims.w
+    h = state.dims.h
+    r = state.rotation
     //set masterCanvasWidth and masterCanvasHeight
 
     canvasWidth = $('#colors_sketch')[0].width;
