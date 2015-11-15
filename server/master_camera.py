@@ -115,12 +115,12 @@ if __name__ == "__main__":
 			if (area > MIN_OBJECT_AREA and area < MAX_OBJECT_AREA) and (ratio > 1.0 / FRAME_RATIO and ratio < FRAME_RATIO) and len(approx) <= 4:
 				idx, screen = interpolateScreen(rect)
 				if idx == None and len(screens)-1 < CONNECTIONS:
-					print "Detected new screen"
 					center, dims, rotation = rect
 					if portrait:
 						dims = [max(dims), min(dims)]
 					else:
 						dims = [min(dims), max(dims)]
+					print "Detected new screen: " + ("portrait" if portrait else "landscape")
 					screens.append([list(center), dims, 0])
 				if len(screens)-1 == CONNECTIONS:
 					break
