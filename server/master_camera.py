@@ -21,7 +21,7 @@ colors = [(255,0,0), (0,255,0), (0,0,255), (255,255,0), (0,255,255), (255,0,255)
 screens = ["none"]
 
 def syncScreens():
-	global CONNECTIONS, prevResp
+	global CONNECTIONS, prevResp, portrait
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
 	resp = firebase.get(_screens)
 	if resp is not None:
@@ -65,6 +65,7 @@ def drawScreens(frame):
 
 
 if __name__ == "__main__":
+	global portrait
 	root = firebase.firebaseURL(APP_NAME)
 	firebase.patch(root, {u'FRAME_WIDTH': FRAME_WIDTH , u'FRAME_HEIGHT': FRAME_HEIGHT, u'RELOAD': -1, u'valid': "no"})
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
@@ -96,13 +97,13 @@ if __name__ == "__main__":
 		#frameDelta = absdiff(firstFrame, gray)
 		firstFrame = gray
 
-		thresh = threshold(gray, 220, 255, THRESH_BINARY)[1]
+		thresh = threshold(gray, 210, 255, THRESH_BINARY)[1]
 		edged = Canny(thresh, 1, 300)
  
 		# dilate the thresholded image to fill in holes, then find contours
 		# on thresholded image
 		edged = dilate(edged, None, iterations=2)
-		(_, cnts, _) = findContours(edged.copy(), RETR_TREE, CHAIN_APPROX_SIMPLE)
+		(_, cnts, _) = findContours(edged.copy(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE)
  
 		for c in cnts:
 			peri = arcLength(c, True)
@@ -116,12 +117,14 @@ if __name__ == "__main__":
 				idx, screen = interpolateScreen(rect)
 				if idx == None and len(screens)-1 < CONNECTIONS:
 					center, dims, rotation = rect
+					h = dims[0] if dims[0] > dims[1] else dims[1]
+					w = dims[1] if dims[0] > dims[1] else dims[0]
 					if portrait:
-						dims = [max(dims), min(dims)]
-					else:
-						dims = [min(dims), max(dims)]
+						temp = h
+						h = w
+						w = temp
 					print "Detected new screen: " + ("portrait" if portrait else "landscape")
-					screens.append([list(center), dims, 0])
+					screens.append([list(center), [w, h], 0])
 				if len(screens)-1 == CONNECTIONS:
 					break
 

@@ -77,7 +77,6 @@ function updateCanvas(screen) {
     //TEMP CODE need firebase to get dimensions of full image
     imgW = image.width;
     imgH = image.height;
-
     topLeftX = (x - w / 2) / FRAME_WIDTH * imgW;
     topLeftY = (y - h / 2) / FRAME_HEIGHT * imgH;
     context = canvas.getContext("2d");
