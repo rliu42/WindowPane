@@ -109,22 +109,13 @@ if __name__ == "__main__":
 			area = rect[1][0] * rect[1][1]
 			ratio = 1.0 * rect[1][0] / rect[1][1]
 			if (area > MIN_OBJECT_AREA and area < MAX_OBJECT_AREA) and (ratio > 1.0 / FRAME_RATIO and ratio < FRAME_RATIO) and len(approx) <= 4:
-				#rect = minAreaRect(c)
-				#box = boxPoints(rect)
-				#box = np.int0(box)
-				#for i in range(4):
-					#line(frame, (box[i][0], box[i][1]), (box[(i+1)%4][0], box[(i+1)%4][1]), (0,255,0), 2)
-				#drawContours(frame, [box], 0, (0,255,0))
-				#print rect
 				idx, screen = interpolateScreen(rect)
-				#print idx, len(screens), CONNECTIONS
 				if idx == None and len(screens)-1 < CONNECTIONS:
 					print "Detected new screen"
 					center, dims, rotation = rect
 					if type(rotation) != type(0.0):
 						rotation = rotation[0][0]
 					screens.append([list(center), list(dims), rotation])
-				#print screens
 				if len(screens)-1 == CONNECTIONS:
 					break
 

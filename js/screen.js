@@ -5,41 +5,43 @@ var id = -1;
 var update = false;
 var image = new Image();
 var state;
-var r = confirm("Join this map?");
 
-root.child("IMAGE").on("value", function(ss){
+root.child("IMAGE").on("value", function(ss) {
     image.src = ss.val();
 })
 
-if (r == true) {
-    root.once("value", function(ss) {
-        resize_canvas()
-        FRAME_WIDTH = ss.val().FRAME_WIDTH
-        FRAME_HEIGHT = ss.val().FRAME_HEIGHT
-        var screens = ss.val()["screens"] || [];
-        id = screens.length;
-        screens.push({
-            center: {
-                x: -1,
-                y: -1
-            },
-            dims: {
-                h: -1,
-                w: -1
-            },
-            rotation: 0
-        });
-        root.child("screens").update(screens);
-        update = true
-        root.child("screens").child(id).on("value", function(ss) {
-            if (update) {
-                state = ss.val();
-                updateCanvas(state);
-            }
-        });
+$(document).ready(function() {
+    var r = confirm("Join this map?");
+    if (r == true) {
+        root.once("value", function(ss) {
+            resize_canvas()
+            FRAME_WIDTH = ss.val().FRAME_WIDTH
+            FRAME_HEIGHT = ss.val().FRAME_HEIGHT
+            var screens = ss.val()["screens"] || [];
+            id = screens.length;
+            screens.push({
+                center: {
+                    x: -1,
+                    y: -1
+                },
+                dims: {
+                    h: -1,
+                    w: -1
+                },
+                rotation: 0
+            });
+            root.child("screens").update(screens);
+            update = true
+            root.child("screens").child(id).on("value", function(ss) {
+                if (update) {
+                    state = ss.val();
+                    updateCanvas(state);
+                }
+            });
 
-    });
-}
+        });
+    }
+});
 
 function updateCanvas(screen) {
     x = screen.center.x
