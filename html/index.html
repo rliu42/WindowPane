@@ -9,6 +9,7 @@
   <style>
     .tools { margin-bottom: 10px; }
     .tools a {
+      opacity: 0.3;
       border: 1px solid black; height: 30px; line-height: 30px; padding: 0 10px; vertical-align: middle; text-align: center; text-decoration: none; display: inline-block; color: black; font-weight: bold; font-family:Sans-Serif;
     }
   </style>
@@ -17,11 +18,13 @@
 <body>
   <div id="colors_demo">
     <div class="tools">
+      <a id="id" style="float: right; width: 100px;">ID</a>
+      <a onclick="reload()" style="float: right; width: 100px;">Refresh</a>
       <a href="#" id="clear_sketch" style="float: right; width: 100px;">Clear</a>
       <a href="#colors_sketch" data-download="png" style="float: right; width: 100px;">Download</a>
     </div>
   </div>
-  <canvas id="colors_sketch" width="800" height="300"></canvas>
+  <canvas id="colors_sketch"></canvas>
   <script type="text/javascript">
     // Macros
 
@@ -30,6 +33,7 @@
       $('#colors_sketch')[0].height = window.innerHeight;
       console.log('resized');
       $('#colors_sketch').sketch().redraw();
+      landscape = window.innerWidth > window.innerHeight;
     }
 
     function uniqueStrokes(oldArr) {
