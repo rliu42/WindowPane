@@ -6,18 +6,20 @@ APP_NAME = 'window-pane'
 
 CONNECTIONS = 0
 FRAME_RATE = 15 # frame update rate in ms
-SYNC_SCREEN_RATE = 100 # check for new screens every X ms
+SYNC_SCREEN_RATE = 75 # check for new screens every X ms
 COUNTER = 0
 
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
-MIN_OBJECT_AREA = 60 * 60
+FRAME_RATIO = 2
+MIN_OBJECT_AREA = 30 * 50
 MAX_OBJECT_AREA = 400 * 400
 
 colors = [(255,0,0), (0,255,0), (0,0,255), (255,255,0), (0,255,255), (255,0,255)]
 screens = ["none"]
 
 def syncScreens():
+	global CONNECTIONS
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
 	resp = firebase.get(_screens)
 	if resp is not None:
@@ -32,7 +34,7 @@ def syncScreens():
 
 
 def interpolateScreen(rect):
-	THRESHOLD = 200
+	THRESHOLD = 100
 	center, dims, rotation = rect
 	for idx, screen in enumerate(screens):
 		if idx > 0:
@@ -98,7 +100,8 @@ if __name__ == "__main__":
 			# drawContours(frame, [c], 0, (0,0, 255), 2)
 			rect = minAreaRect(c)
 			area = rect[1][0] * rect[1][1]
-			if area > MIN_OBJECT_AREA and area < MAX_OBJECT_AREA and len(approx) <= 6:
+			ratio = 1.0 * rect[1][0] / rect[1][1]
+			if (area > MIN_OBJECT_AREA and area < MAX_OBJECT_AREA) and (ratio > 1.0 / FRAME_RATIO and ratio < FRAME_RATIO) and len(approx) <= 4:
 				#rect = minAreaRect(c)
 				#box = boxPoints(rect)
 				#box = np.int0(box)
@@ -107,7 +110,9 @@ if __name__ == "__main__":
 				#drawContours(frame, [box], 0, (0,255,0))
 				#print rect
 				idx, screen = interpolateScreen(rect)
-				if idx is None and len(screens)-1 <= CONNECTIONS:
+				#print idx, len(screens), CONNECTIONS
+				if idx == None and len(screens)-1 < CONNECTIONS:
+					print "Detected new screen"
 					screens.append(rect)
 				#print screens
 				if len(screens)-1 == CONNECTIONS:
@@ -116,7 +121,7 @@ if __name__ == "__main__":
 		drawScreens(frame)
 
 		#imshow("Delta",frameDelta);
-		imshow("Edges", edged);
+		#imshow("Edges", edged);
 		#imshow("Thresh", thresh)
 		imshow("Webcam", frame);
 		
