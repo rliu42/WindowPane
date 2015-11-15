@@ -7,15 +7,17 @@ var image = new Image();
 var state;
 var r = confirm("Join this map?");
 
+root.child("IMAGE").on("value", function(ss){
+    image.src = ss.val();
+})
+
 if (r == true) {
     root.once("value", function(ss) {
         resize_canvas()
-        image.src = ss.val().IMAGE || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Civil_and_Naval_Ensign_of_France.svg/2000px-Civil_and_Naval_Ensign_of_France.svg.png";
         FRAME_WIDTH = ss.val().FRAME_WIDTH
         FRAME_HEIGHT = ss.val().FRAME_HEIGHT
         var screens = ss.val()["screens"] || [];
         id = screens.length;
-        alert(id)
         screens.push({
             center: {
                 x: -1,

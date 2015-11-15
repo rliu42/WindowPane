@@ -36,6 +36,7 @@ def syncScreens():
 def interpolateScreen(rect):
 	THRESHOLD = 75
 	center, dims, rotation = rect
+	rotation = min(rotation, rotation + 90)
 	for idx, screen in enumerate(screens):
 		if idx > 0:
 			diff = abs(screen[0][1] - center[1]) + abs(screen[0][0] - center[0]) 
