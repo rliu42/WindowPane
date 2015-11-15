@@ -44,7 +44,7 @@ def interpolateScreen(rect):
 			diff = abs(screen[0][1] - center[1]) + abs(screen[0][0] - center[0]) 
 			if (diff > 5 and diff < THRESHOLD):
 				screens[idx][0] = list(center)
-				screens[idx][2] = rotation
+				screens[idx][2] = 0
 				return idx, screens[idx]
 			elif diff <= 5:
 				return -1, -1
@@ -113,9 +113,7 @@ if __name__ == "__main__":
 				if idx == None and len(screens)-1 < CONNECTIONS:
 					print "Detected new screen"
 					center, dims, rotation = rect
-					if type(rotation) != type(0.0):
-						rotation = rotation[0][0]
-					screens.append([list(center), list(dims), rotation])
+					screens.append([list(center), list(dims), 0])
 				if len(screens)-1 == CONNECTIONS:
 					break
 
