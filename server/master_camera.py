@@ -15,13 +15,13 @@ FRAME_RATIO = 2.25
 MIN_OBJECT_AREA = 30 * 40
 MAX_OBJECT_AREA = 400 * 400
 prevResp = []
-portrait = True
+landscape = True
 
 colors = [(255,0,0), (0,255,0), (0,0,255), (255,255,0), (0,255,255), (255,0,255)]
 screens = ["none"]
 
 def syncScreens():
-	global CONNECTIONS, prevResp, portrait
+	global CONNECTIONS, prevResp, landscape
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
 	resp = firebase.get(_screens)
 	if resp is not None:
@@ -31,7 +31,7 @@ def syncScreens():
 			print resp
 			if CONNECTIONS >= 1:
 				if "innerWidth" in resp[-1].keys():
-					portrait = resp[-1]["innerWidth"] > resp[-1]["innerHeight"]
+					landscape = resp[-1]["innerWidth"] > resp[-1]["innerHeight"]
 			prevResp = resp
 	for idx, screen in enumerate(screens):
 		if idx > 0:
@@ -65,7 +65,6 @@ def drawScreens(frame):
 
 
 if __name__ == "__main__":
-	global portrait
 	root = firebase.firebaseURL(APP_NAME)
 	firebase.patch(root, {u'FRAME_WIDTH': FRAME_WIDTH , u'FRAME_HEIGHT': FRAME_HEIGHT, u'RELOAD': -1, u'valid': "no"})
 	_screens = firebase.firebaseURL(APP_NAME + "/screens")
@@ -119,11 +118,11 @@ if __name__ == "__main__":
 					center, dims, rotation = rect
 					h = dims[0] if dims[0] > dims[1] else dims[1]
 					w = dims[1] if dims[0] > dims[1] else dims[0]
-					if portrait:
+					if landscape:
 						temp = h
 						h = w
 						w = temp
-					print "Detected new screen: " + ("portrait" if portrait else "landscape")
+					print "Detected new screen: " + ("landscape" if landscape else "portrait")
 					screens.append([list(center), [w, h], 0])
 				if len(screens)-1 == CONNECTIONS:
 					break
