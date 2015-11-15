@@ -8,7 +8,7 @@ var state;
 
 root.child("IMAGE").on("value", function(ss) {
     image.src = ss.val();
-})
+});
 
 $(document).ready(function() {
     var r = confirm("Join this map?");
@@ -18,7 +18,10 @@ $(document).ready(function() {
             FRAME_WIDTH = ss.val().FRAME_WIDTH
             FRAME_HEIGHT = ss.val().FRAME_HEIGHT
             var screens = ss.val()["screens"] || [];
-            id = screens.length;
+            id = ss.val().RELOAD;
+            if (id < 0) {
+                screens.length;
+            }
             screens.push({
                 center: {
                     x: -1,
@@ -42,6 +45,13 @@ $(document).ready(function() {
         });
     }
 });
+
+function reload() {
+    if (id > 0) {
+        root.update({RELOAD: id})
+    }
+    location.reload(true)
+}
 
 function updateCanvas(screen) {
     x = screen.center.x
