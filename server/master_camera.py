@@ -6,7 +6,7 @@ APP_NAME = 'window-pane'
 
 CONNECTIONS = 0
 FRAME_RATE = 15 # frame update rate in ms
-SYNC_SCREEN_RATE = 75 # check for new screens every X ms
+SYNC_SCREEN_RATE = 25 # check for new screens every X ms
 COUNTER = 0
 
 FRAME_WIDTH = 640
