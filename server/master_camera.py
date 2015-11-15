@@ -33,7 +33,7 @@ def syncScreens():
 		if idx > 0:
 			s = firebase.firebaseURL(APP_NAME + "/screens/" + str(idx))
 			center, dims, rotation = screen
-			firebase.put(s, {u'center': {u'x':int(center[0]), u'y':int(center[1])}, u'dims': {u'h':int(dims[0]), u'w':int(dims[1])}, u'rotation': int(rotation)})
+			firebase.put(s, {u'center': {u'x':int(center[0]), u'y':int(center[1])}, u'dims': {u'h':int(dims[1]), u'w':int(dims[0])}, u'rotation': int(rotation)})
 
 
 def interpolateScreen(rect):
