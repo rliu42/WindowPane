@@ -23,7 +23,7 @@
       <a href="#colors_sketch" data-download="png" style="float: right; width: 100px;">Download</a>
     </div>
   </div>
-  <canvas id="colors_sketch" width="800" height="300"></canvas>
+  <canvas id="colors_sketch"></canvas>
   <script type="text/javascript">
     // Macros
 
@@ -32,6 +32,7 @@
       $('#colors_sketch')[0].height = window.innerHeight;
       console.log('resized');
       $('#colors_sketch').sketch().redraw();
+      landscape = window.innerWidth > window.innerHeight;
     }
 
     function uniqueStrokes(oldArr) {

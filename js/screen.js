@@ -5,6 +5,7 @@ var id = -1;
 var update = false;
 var image = new Image();
 var state;
+var landscape = window.innerWidth > window.innerHeight;
 
 root.child("IMAGE").on("value", function(ss) {
     image.src = ss.val();
@@ -77,8 +78,8 @@ function updateCanvas(screen) {
     //TEMP CODE need firebase to get dimensions of full image
     imgW = image.width;
     imgH = image.height;
-    topLeftX = (x - w / 2) / FRAME_WIDTH * imgW;
-    topLeftY = (y - h / 2) / FRAME_HEIGHT * imgH;
+    topLeftX = (x - w / 2) / (!landscape ? FRAME_WIDTH : FRAME_HEIGHT) * imgW;
+    topLeftY = (y - h / 2) / (!landscape ? FRAME_HEIGHT : FRAME_WIDTH) * imgH;
     context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
     //context.rotate(r)
